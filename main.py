@@ -3,6 +3,7 @@ import numpy as np
 import os
 from dates_generator import dates_generator
 import argparse
+from datetime import datetime
 
 sample_text = 'это жанр журналистики в котором автор ставит задачу проанализировать общественные ситуации процессы явления прежде всего с точки зрения закономерностей лежащих в их основе Такому жанру как статья присуща ширина практических обобщений глубокий анализ фактов и явлений четкая социальная направленность В статье автор рассматривает отдельные ситуации как часть более широкого явления Автор аргументированно пишет о своей точке зрения В статье выражается развернутая обстоятельная аргументированная концепция автора или редакции по поводу актуальной социологической проблемы Также в статье журналист обязательно должен интерпретировать факты это могут быть цифры дополнительная информация которая будет правильно расставлять акценты и ярко раскрывать суть вопроса Отличительным аспектом статьи является её готовность Если подготавливаемый материал так и не был опубликован не вышел в тираж не получил распространения то такой труд относить к статье некорректно Скорее всего данную работу можно назвать черновиком или заготовкой Поэтому целью любой статьи является распространение содержащейся в ней информации'
 
@@ -55,8 +56,18 @@ def create_dates_dataset(args):
         dir_path = args.path
     else:
         dir_path = None
-        
-    list_of_dates = dates_generator(cnt)
+
+    if args.start:
+        start_date = datetime.strptime(args.start, "%d.%m.%Y")
+    else:
+        start_date = None
+
+    if args.end:
+        end_date = datetime.strptime(args.end, "%d.%m.%Y")
+    else:
+        end_date = None
+
+    list_of_dates = dates_generator(cnt, start_date=start_date, end_date=end_date)
     for i in range(cnt):
         clear_text = get_raw_text(list_of_dates[i])
         file_name = make_file_name(i)
@@ -68,6 +79,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--path', type=str, required=False, help='path with txt files')
     parser.add_argument('--cnt', type=int, required=True, help='number of files')
+    parser.add_argument('--start', type=str, required=False, help='from what day should generate. mask dd.mm.yyyy')
+    parser.add_argument('--end', type=str, required=False, help='till what day should generate. mask dd.mm.yyyy')
 
     args = parser.parse_args()
     create_dates_dataset(args)
